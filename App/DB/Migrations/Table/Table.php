@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\DB\Table;
+namespace App\DB\Migrations\Table;
 
-use App\DB\Table\Field\Field;
-use App\DB\Table\Field\FieldDuplicationException;
-use App\DB\Table\Field\FieldSqlConvertorInterface;
-use App\DB\Table\Field\MySqlFieldConvertor;
+use App\DB\Migrations\Table\Field\Field;
+use App\DB\Migrations\Table\Field\FieldDuplicationException;
+use App\DB\Migrations\Table\Field\FieldSqlConvertorInterface;
+use App\DB\Migrations\Table\Field\MySqlFieldConvertor;
 
 class Table
 {
@@ -50,19 +50,15 @@ class Table
         }
 
         $res = '';
-
         foreach ($this->fields as $field){
             $res .= $this->convertor->convert($field);
         }
 
-        $temp = preg_replace('/, $/', ' ', $res);
-
-        return $temp;
+        return preg_replace('/, $/', ' ', $res);
     }
 
-    public function getSqlQuery(): string
+    public function createTableSqlCode(): string
     {
-        $keysSql = '';
         $fieldsSql = $this->getFieldsQuery();
 
         return sprintf(
@@ -70,6 +66,15 @@ class Table
             $this->dbName,
             $this->tableName,
             $fieldsSql
+        );
+    }
+
+    public function dropSQLTable(): string
+    {
+        return sprintf(
+            'DROP TABLE IF EXISTS `%s`.`%s`',
+            $this->dbName,
+            $this->tableName,
         );
     }
 }

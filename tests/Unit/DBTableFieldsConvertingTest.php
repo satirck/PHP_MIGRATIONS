@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit;
 
-use App\DB\Table\Field\FieldDuplicationException;
-use App\DB\Table\Field\FieldSqlConvertorInterface;
-use App\DB\Table\Field\MySqlFieldConvertor;
-use App\DB\Table\Table;
+use App\DB\Migrations\Table\Field\FieldDuplicationException;
+use App\DB\Migrations\Table\Field\FieldSqlConvertorInterface;
+use App\DB\Migrations\Table\Field\MySqlFieldConvertor;
+use App\DB\Migrations\Table\Table;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DB\Table\Field;
+namespace App\DB\Migrations\Table\Field;
 
 interface FieldSqlConvertorInterface
 {
