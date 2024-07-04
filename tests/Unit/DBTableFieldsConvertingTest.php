@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit;
 
-use App\DB\FieldDuplicationException;
-use App\DB\FieldSqlConvertorInterface;
-use App\DB\MySqlFieldConvertor;
-use App\DB\Table;
+use App\DB\Table\Field\FieldDuplicationException;
+use App\DB\Table\Field\FieldSqlConvertorInterface;
+use App\DB\Table\Field\MySqlFieldConvertor;
+use App\DB\Table\Table;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +36,7 @@ class DBTableFieldsConvertingTest extends TestCase
         $table->addField('u_name', 'varchar(20)', false);
         $table->addField('u_status', 'varchar(20)');
 
-        $exp = '`u_id` int NOT NULL, `u_name` varchar(20) NOT NULL, `u_status` varchar(20), ';
+        $exp = '`u_id` int NOT NULL, `u_name` varchar(20) NOT NULL, `u_status` varchar(20) ';
         $realFieldQuery = $table->getFieldsQuery();
         $this->assertEquals(
             $exp,

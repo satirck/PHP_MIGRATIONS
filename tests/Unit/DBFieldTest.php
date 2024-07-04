@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit;
 
-use App\DB\Field;
-use App\DB\FieldSqlConvertorInterface;
-use App\DB\MySqlFieldConvertor;
+use App\DB\Table\Field\Field;
+use App\DB\Table\Field\FieldSqlConvertorInterface;
+use App\DB\Table\Field\MySqlFieldConvertor;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 

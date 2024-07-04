@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\DB;
+namespace App\DB\Table;
+
+use App\DB\Table\Field\Field;
+use App\DB\Table\Field\FieldDuplicationException;
+use App\DB\Table\Field\FieldSqlConvertorInterface;
+use App\DB\Table\Field\MySqlFieldConvertor;
 
 class Table
 {
@@ -10,8 +15,6 @@ class Table
      * @var Field[]
      */
     private array $fields = [];
-    private array $indexes = [];
-    private array $keys = [];
 
     public function __construct(
         public readonly string $dbName,
@@ -52,6 +55,21 @@ class Table
             $res .= $this->convertor->convert($field);
         }
 
-        return $res;
+        $temp = preg_replace('/, $/', ' ', $res);
+
+        return $temp;
+    }
+
+    public function getSqlQuery(): string
+    {
+        $keysSql = '';
+        $fieldsSql = $this->getFieldsQuery();
+
+        return sprintf(
+        'CREATE TABLE IF NOT EXISTS `%s`.`%s` (%s)',
+            $this->dbName,
+            $this->tableName,
+            $fieldsSql
+        );
     }
 }
