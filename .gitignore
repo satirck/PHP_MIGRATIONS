@@ -4,3 +4,4 @@
 /build/
 /coverage/
 /.phpunit.result.cache/
+/.vscode/

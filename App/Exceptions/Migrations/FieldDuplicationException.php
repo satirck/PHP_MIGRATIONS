@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\DB\Migrations\Table\Field;
+namespace App\Exceptions\Migrations;
 
 use Exception;
 
