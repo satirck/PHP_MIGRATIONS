@@ -23,5 +23,19 @@ interface DBQueryGeneratorInterface
      */
     public function dropTable(string $dbName, string $tableName): string;
 
+    /**
+     * @param string $dbName
+     * @param string $tableName
+     * @param Field[] $addingFields
+     * @param string[] $removingFields
+     * @return string
+     */
+    public function updateTable(
+        string $dbName,
+        string $tableName,
+        array $addingFields,
+        array $removingFields
+    ): string;
+
     public function getFieldSql(Field $field): string;
 }

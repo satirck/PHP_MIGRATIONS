@@ -19,7 +19,12 @@ class Table
     /**
      * @var Field[]
      */
-    private array $fields = [];
+    private array $addingFields = [];
+
+    /**
+     * @var string[]
+     */
+    private array $removingFields = [];
 
     private TableAction $action = TableAction::EMPTY;
 
@@ -65,12 +70,22 @@ class Table
 
     public function setColumn(string $name, string $type, bool $isNullable = true): void
     {
-        $this->fields[$name] = new Field($name, $type, $isNullable);
+        $this->addingFields[$name] = new Field($name, $type, $isNullable);
     }
 
-    public function getColumn(string $name): Field|null
+    public function removeColumn(string $name): void
     {
-        return $this->fields[$name] ?? null;
+        $this->removingFields[$name] = $name;
+    }
+
+    public function getRemovableColumn(string $name): ?string
+    {
+        return $this->removingFields[$name] ?? null;
+    }
+
+    public function getColumn(string $name): ?Field
+    {
+        return $this->addingFields[$name] ?? null;
     }
 
     /**
@@ -99,14 +114,14 @@ class Table
      */
     private function tableCreateSQL(): string
     {
-        if ($this->fields === []) {
+        if ($this->addingFields === []) {
             throw new MigrationEmptyFieldsException('For creating database ypu need at least 1 attribute');
         }
 
         return $this->queryGenerator->createTable(
             $this->db,
             $this->table,
-            $this->fields
+            $this->addingFields,
         );
     }
 
@@ -118,9 +133,24 @@ class Table
         );
     }
 
+    /**
+     * @return string
+     * @throws MigrationEmptyFieldsException
+     */
     private function tableUpdateSQL(): string
     {
-        return '';
+        if ($this->addingFields === [] && $this->removingFields === []) {
+            throw new MigrationEmptyFieldsException(
+                'For updating database ypu need at least 1 column for remove or add'
+            );
+        }
+
+        return $this->queryGenerator->updateTable(
+            $this->db,
+            $this->table,
+            $this->addingFields,
+            $this->removingFields
+        );
     }
 
     /**

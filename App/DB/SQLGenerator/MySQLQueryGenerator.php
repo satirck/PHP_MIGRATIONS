@@ -38,7 +38,6 @@ class MySQLQueryGenerator implements DBQueryGeneratorInterface
             $tableName,
             $fieldsStr
         );
-
     }
 
     public function dropTable(string $dbName, string $tableName): string
@@ -47,6 +46,44 @@ class MySQLQueryGenerator implements DBQueryGeneratorInterface
             'DROP TABLE IF EXISTS `%s`.`%s`;',
             $dbName,
             $tableName
+        );
+    }
+
+    public function updateTable(string $dbName, string $tableName, array $addingFields, array $removingFields): string
+    {
+        $addingPart = $removingPart = '';
+
+        if ($addingFields !== []){
+            $addingFieldsStrArr = array_map('self::getFieldSql', $addingFields);
+            $addingFieldsStrArr = array_map(
+                function (string $s) {
+                    return sprintf('%s%s', 'ADD COLUMN ', $s);
+                },
+                $addingFieldsStrArr
+            );
+            $addingPart = implode(', ', $addingFieldsStrArr);
+        }
+
+        if ($removingFields !== []){
+            $removingFieldsStrArr = array_map(
+                function (string $s) {
+                    return sprintf('%s`%s`', 'DROP COLUMN ', $s);
+                },
+                $removingFields
+            );
+            $removingPart = implode(', ', $removingFieldsStrArr);
+        }
+
+        if ($addingPart !== '' && $removingPart !== ''){
+            $addingPart = implode([$addingPart, ', ']);
+        }
+
+        return sprintf(
+            'ALTER TABLE `%s`.`%s` %s%s;',
+            $dbName,
+            $tableName,
+            $addingPart,
+            $removingPart
         );
     }
 }

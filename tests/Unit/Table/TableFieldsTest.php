@@ -36,6 +36,18 @@ class TableFieldsTest extends TestCase
         );
     }
 
+    public function testRemovableFieldTable(): void
+    {
+        $table = $this->table;
+        $table->removeColumn('name');
+
+        $exp = 'name';
+        $this->assertEquals(
+            $exp,
+            $table->getRemovableColumn('name')
+        );
+    }
+
     public function testNullFieldTable(): void
     {
         $table = $this->table;

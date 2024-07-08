@@ -72,4 +72,16 @@ class SimpleTableActionsSqlTest extends TestCase
 
         $this->table->getSQLQuery();
     }
+
+    /**
+     * @return void
+     * @throws
+     */
+    public function testUpdateEmptyFieldsTable(): void
+    {
+        $this->expectException(MigrationEmptyFieldsException::class);
+        $this->table->update('db',  'test');
+
+        $this->table->getSQLQuery();
+    }
 }

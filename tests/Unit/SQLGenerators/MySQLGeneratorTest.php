@@ -83,4 +83,39 @@ class MySQLGeneratorTest extends TestCase
             $this->queryGenerator->createTable('db', 'test', $fields)
         );
     }
+
+    public function testUpdateTableField(): void
+    {
+        $field = new Field('name', 'varchar(20)');
+        $real = $this->queryGenerator->updateTable('db', 'test', [$field], []);
+        $exp = 'ALTER TABLE `db`.`test` ADD COLUMN `name` varchar(20);';
+
+        $this->assertEquals(
+            $exp,
+            $real
+        );
+    }
+
+    public function testRemoveTableField(): void
+    {
+        $real = $this->queryGenerator->updateTable('db', 'test', [], ['age']);
+        $exp = 'ALTER TABLE `db`.`test` DROP COLUMN `age`;';
+
+        $this->assertEquals(
+            $exp,
+            $real
+        );
+    }
+
+    public function testUpdateAndRemoveTableField(): void
+    {
+        $field = new Field('name', 'varchar(20)');
+        $real = $this->queryGenerator->updateTable('db', 'test', [$field], ['age']);
+        $exp = 'ALTER TABLE `db`.`test` ADD COLUMN `name` varchar(20), DROP COLUMN `age`;';
+
+        $this->assertEquals(
+            $exp,
+            $real
+        );
+    }
 }
