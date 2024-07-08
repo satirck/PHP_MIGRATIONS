@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Migrations;
+namespace App\DB\Migrations;
 
 enum TableAction
 {
-    case Empty;
+    case EMPTY;
     case CREATE;
     case UPDATE;
     case REMOVE;

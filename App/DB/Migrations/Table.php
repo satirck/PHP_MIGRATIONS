@@ -2,46 +2,75 @@
 
 declare(strict_types=1);
 
-namespace App\Migrations;
+namespace App\DB\Migrations;
 
+use App\DB\SQLGenerator\DBQueryGeneratorInterface;
 use App\Exceptions\Migrations\DBNameNotSetException;
 use App\Exceptions\Migrations\MigrationActionNotSetException;
 use App\Exceptions\Migrations\MigrationEmptyFieldsException;
 use App\Exceptions\Migrations\TableNameNotSetException;
-use App\Migrations\Field\Field;
 
 class Table
 {
+    private string $db;
+
+    private string $table;
+
     /**
      * @var Field[]
      */
     private array $fields = [];
 
-    private TableAction $action = TableAction::Empty;
+    private TableAction $action = TableAction::EMPTY;
 
-    private string $db;
+    public function __construct(
+        protected DBQueryGeneratorInterface $queryGenerator
+    )
+    {
+    }
 
-    private string $table;
+    public function getAction(): TableAction
+    {
+        return $this->action;
+    }
 
     public function create(string $db, string $table): void
     {
-        $this->db = $db;
-        $this->table = $table;
-        $this->action = TableAction::CREATE;
+        $this->setTableData($db, $table);
+        $this->setStatus(TableAction::CREATE);
     }
 
     public function update(string $db, string $table): void
     {
-        $this->db = $db;
-        $this->table = $table;
-        $this->action = TableAction::UPDATE;
+        $this->setTableData($db, $table);
+        $this->setStatus(TableAction::UPDATE);
     }
 
     public function remove(string $db, string $table): void
     {
+        $this->setTableData($db, $table);
+        $this->setStatus(TableAction::REMOVE);
+    }
+
+    private function setTableData(string $db, string $table): void
+    {
         $this->db = $db;
         $this->table = $table;
-        $this->action = TableAction::REMOVE;
+    }
+
+    private function setStatus(TableAction $action): void
+    {
+        $this->action = $action;
+    }
+
+    public function setColumn(string $name, string $type, bool $isNullable = true): void
+    {
+        $this->fields[$name] = new Field($name, $type, $isNullable);
+    }
+
+    public function getColumn(string $name): Field|null
+    {
+        return $this->fields[$name] ?? null;
     }
 
     /**
@@ -52,15 +81,15 @@ class Table
      */
     private function checkReqFields(): void
     {
-        if ($this->action === TableAction::Empty){
+        if ($this->action === TableAction::EMPTY) {
             throw new MigrationActionNotSetException('Cannot give sql code cause no type of action is set');
         }
 
-        if ($this->db === ''){
+        if ($this->db === '') {
             throw new DBNameNotSetException('Cannot give sql code cause of not set db name');
         }
 
-        if ($this->table === ''){
+        if ($this->table === '') {
             throw new TableNameNotSetException('Cannot give sql code cause of not set db name');
         }
     }
@@ -70,32 +99,29 @@ class Table
      */
     private function tableCreateSQL(): string
     {
-        if ($this->fields === []){
+        if ($this->fields === []) {
             throw new MigrationEmptyFieldsException('For creating database ypu need at least 1 attribute');
         }
 
-        return sprintf(
-            'CREATE TABLE IF NOT EXISTS `%s`.`%s` ();',
+        return $this->queryGenerator->createTable(
             $this->db,
-            $this->table
+            $this->table,
+            $this->fields
         );
     }
 
     private function tableDropSQL(): string
     {
-        return sprintf(
-            'DROP TABLE IF EXISTS `%s`.`%s` ();',
+        return $this->queryGenerator->dropTable(
             $this->db,
-            $this->table
+            $this->table,
         );
     }
 
-    private function tableUpdateSQL(): string{
-
-
+    private function tableUpdateSQL(): string
+    {
         return '';
     }
-
 
     /**
      * @throws DBNameNotSetException
@@ -107,12 +133,12 @@ class Table
     {
         $this->checkReqFields();
 
-        if ($this->action === TableAction::CREATE){
+        if ($this->action === TableAction::CREATE) {
             return $this->tableCreateSQL();
         }
 
-        if ($this->action === TableAction::REMOVE){
-            return $this->tableCreateSQL();
+        if ($this->action === TableAction::REMOVE) {
+            return $this->tableDropSQL();
         }
 
         return $this->tableUpdateSQL();

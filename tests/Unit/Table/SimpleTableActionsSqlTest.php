@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit;
+namespace App\Tests\Unit\Table;
 
+use App\DB\Migrations\Table;
+use App\DB\SQLGenerator\MySQLQueryGenerator;
 use App\Exceptions\Migrations\DBNameNotSetException;
 use App\Exceptions\Migrations\MigrationActionNotSetException;
 use App\Exceptions\Migrations\MigrationEmptyFieldsException;
 use App\Exceptions\Migrations\TableNameNotSetException;
-use App\Migrations\Table;
 use PHPUnit\Framework\TestCase;
 
 class SimpleTableActionsSqlTest extends TestCase
@@ -20,7 +21,9 @@ class SimpleTableActionsSqlTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->table = new Table();
+        $this->table = new Table(
+            new MySQLQueryGenerator()
+        );
     }
 
     /**

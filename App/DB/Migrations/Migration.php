@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Migrations;
+namespace App\DB\Migrations;
 
-abstract class AbstractMigration
+abstract class Migration
 {
     public function __construct(
         public readonly Table $table
